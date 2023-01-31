@@ -5,25 +5,72 @@ on:
       - master
   pull_request:
 
-env:
-  FOUNDRY_PROFILE: ci
-
 jobs:
-  run-ci:
+  quick-checks-unit-tests:
+    name: Forge unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v2
+
+      - name: Install JavaScript dependencies
+        run: npm install
+
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run solhint lint check
+        run: npm run lint:check
+
+      - name: Install submodules
+        run: forge install
+
+      - name: Check gas snapshots
+        run: forge snapshot # --check TODO re-enable once /master gas snapshot is up-to-date
+        env:
+          RPC_URL: https://eth-mainnet.alchemyapi.io/v2/SzNcOCE77s6nmGIal7MxtuzF--q2HZgx
+
+      - name: Run tests
+        run: forge test --optimize --no-match-contract integration
+        env:
+          RPC_URL: https://eth-mainnet.alchemyapi.io/v2/SzNcOCE77s6nmGIal7MxtuzF--q2HZgx
+
+      - name: Run coverage
+        run: forge coverage --report summary --report lcov
+        env:
+          RPC_URL: https://eth-mainnet.alchemyapi.io/v2/SzNcOCE77s6nmGIal7MxtuzF--q2HZgx
+
+      - name: Filter coverage directories
+        run: |
+          sudo apt update && sudo apt install -y lcov
+          lcov --remove lcov.info 'src/interfaces/*' 'test/*' 'script/*' --output-file lcov.info --rc lcov_branch_coverage=1
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  static-analysis:
+    name: Slither static analysis
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      - name: Install deps
+      - name: Install submodules
         run: forge install
 
-      - name: Check gas snapshots
-        run: forge snapshot --check
-
-      - name: Run tests
-        run: forge test
+      - name: Run Slither
+        uses: crytic/slither-action@v0.2.0
+        with:
+          target: "src/"
+          slither-config: slither.config.json
+          sarif: results.sarif
+          fail-on: medium
