@@ -457,6 +457,4 @@ library Posit {
 
         return n;
     }
-
-    // TODO: Float nlz
 }
