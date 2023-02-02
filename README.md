@@ -1,6 +1,6 @@
-# <h1 align="center"> Solidity Float </h1>
+# <h1 align="center"> Solidity Posit </h1>
 
-**An IEEE 754-2008 like floating point implementation for solidity**
+**A Posit implementation for solidity**
 
 ![Github Actions](https://github.com/valorem-labs-inc/solidity-float/workflows/CI/badge.svg)
 
