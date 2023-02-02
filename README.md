@@ -1,4 +1,4 @@
-# <h1 align="center"> Solidity Posit </h1>
+# <h1 align="center"> Posits for Solidity </h1>
 
 **A Posit implementation for solidity**
 
