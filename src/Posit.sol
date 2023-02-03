@@ -12,6 +12,7 @@
 
 pragma solidity >=0.8.8;
 
+
 type Posit256 is bytes32;
 
 struct Quire4096 {
@@ -19,13 +20,26 @@ struct Quire4096 {
 }
 
 library Posit {
+
+    // The posit values are a superset of all integers 𝑖 in a range
+    // −pIntMax ≤ 𝑖 ≤ pIntMax. Outside that range, integers exist
+    // that cannot be expressed as a posit value without rounding
+    // to a different integer; pIntMax is ⌈2^⌊4(𝑛−3)/5⌋⌉.
+    // Here, n = 256, so pIntMax = 2^202.
+    uint256 constant pIntMax = 6427752177035961102167848369364650410088811975131171341205504;
+
+    // This allows for values from 2 × 10^−78297 to 5 × 10^78296
+    uint256 constant es = 10;
+
     error NotYetImplemented();
 
     // Conversions between posit format and integer format
 
     // @return the integer-valued posit value representing x.
-    function fromInt(int256 x) external pure returns (Posit256) {
-        revert NotYetImplemented();
+    function fromInt(int256 x) external pure returns (Posit256 y) {
+        if (x < 0) {
+
+        }
     }
 
     // @return the integer nearest to x, returns the nearest
@@ -40,6 +54,7 @@ library Posit {
 
     // @return -x.
     function negate(Posit256 x) external pure returns (Posit256) {
+
         revert NotYetImplemented();
     }
 
